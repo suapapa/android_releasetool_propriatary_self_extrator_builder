@@ -6,10 +6,10 @@ INSTALLER=installer.templete
 DECOMPRESSER=decompress_after_accept_license.templete
 
 echo "Cleaning up existing payload..."
+rm -rf payload*
+
+mkdir payload
 PAYLOAD_DIR=`realpath payload`
-rm -rf $PAYLOAD_DIR
-rm payload.tar.gz
-mkdir $PAYLOAD_DIR
 
 echo "Copying source archive to payload from $SOURCE_GIT_PATH..."
 pushd $SOURCE_GIT_PATH &> /dev/null
@@ -47,5 +47,6 @@ else
     exit 1
 fi
 
+rm -rf payload*
 chmod +x $OUT
 echo "Done. made $OUT"
