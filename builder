@@ -4,8 +4,6 @@ SOURCE_GIT_PATH=$1
 SOURCE_HEAD=$2
 INSTALLER=installer.templete
 DECOMPRESSER=decompress_after_accept_license.templete
-OUT=selfextract.bsx
-
 
 echo "Cleaning up existing payload..."
 PAYLOAD_DIR=`realpath payload`
@@ -15,6 +13,11 @@ mkdir $PAYLOAD_DIR
 
 echo "Copying source archive to payload from $SOURCE_GIT_PATH..."
 pushd $SOURCE_GIT_PATH &> /dev/null
+
+OUT_VERSION=`git rev-parse --short $SOURCE_HEAD`
+OUT_VERSION=$OUT_VERSION`date +_%Y%m%d`
+OUT=samsung_exynos4_proprietary_$OUT_VERSION.run
+
 git archive $SOURCE_HEAD -o $PAYLOAD_DIR/files.tar
 popd &> /dev/null
 
