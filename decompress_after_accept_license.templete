@@ -1,0 +1,28 @@
+#!/bin/bash
+
+export TMPDIR=`mktemp -d /tmp/selfextract.XXXXXX`
+
+ARCHIVE=`awk '/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0; }' $0`
+CDIR=`pwd`
+
+# LICENSE.txt, installer and payload.tar should be existed in $TMPDIR
+tail -n+$ARCHIVE $0 | tar xz -C $TMPDIR
+pushd $TMPDIR &> /dev/null
+
+# Show License
+more LICENSE.txt
+
+# Excpect "I ACCEPT"
+echo ""
+read -p 'Type "I ACCEPT" if you agree to the terms of the license: '
+[ "$REPLY" == "I ACCEPT" ] || exit 1
+
+# Install
+./installer $CDIR
+
+popd &> /dev/null
+rm -rf $TMPDIR
+
+exit 0
+
+__ARCHIVE_BELOW__
