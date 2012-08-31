@@ -14,9 +14,10 @@ PAYLOAD_DIR=`realpath payload`
 echo "Copying source archive to payload from $SOURCE_GIT_PATH..."
 pushd $SOURCE_GIT_PATH &> /dev/null
 
+mkdir -p out
 OUT_VERSION=`git rev-parse --short $SOURCE_HEAD`
 OUT_VERSION=$OUT_VERSION`date +_%Y%m%d`
-OUT=samsung_exynos4_proprietary_$OUT_VERSION.run
+OUT=out/samsung_exynos4_proprietary_$OUT_VERSION.run
 
 git archive $SOURCE_HEAD -o $PAYLOAD_DIR/files.tar
 popd &> /dev/null
