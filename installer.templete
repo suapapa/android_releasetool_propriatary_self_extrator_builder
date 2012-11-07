@@ -1,8 +1,0 @@
-#!/bin/bash
-
-CDIR=$1
-INSTALL_PATH=$CDIR/vendor/samsung/exynos4/proprietary
-mkdir -p $INSTALL_PATH
-
-echo "Installing files to $INSTALL_PATH..."
-tar -xvf ./files.tar -C $INSTALL_PATH
