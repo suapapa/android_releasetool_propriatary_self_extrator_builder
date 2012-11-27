@@ -11,15 +11,12 @@ SOURCE_HEAD=$2
 EXTRACT_TO=$3
 OUTPUT_PREFIX=$4
 
-DECOMPRESSER=decompress_after_accept_license.templete
-
 echo "Cleaning up existing payload..."
 rm -rf payload*
 
 mkdir payload
 mkdir -p out
 PAYLOAD_DIR=`realpath payload`
-
 
 echo "Copying source archive to payload from $SOURCE_GIT_PATH..."
 pushd $SOURCE_GIT_PATH &> /dev/null
@@ -59,7 +56,37 @@ if [ -e "payload.tar" ]; then
     gzip payload.tar
 
     if [ -e "payload.tar.gz" ]; then
-        cat $DECOMPRESSER payload.tar.gz > $OUT
+	cat > $OUT << EOF
+#!/bin/bash
+
+export TMPDIR=\`mktemp -d /tmp/selfextract.XXXXXX\`
+
+ARCHIVE=\`awk '/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0; }' \$0\`
+CDIR=\`pwd\`
+
+# LICENSE.txt, installer and payload.tar should be existed in \$TMPDIR
+tail -n+\$ARCHIVE \$0 | tar xz -C \$TMPDIR
+pushd \$TMPDIR &> /dev/null
+
+# Show License
+[ \$1 == "skip" ] || more LICENSE.txt
+
+# Excpect "I ACCEPT"
+echo ""
+read -p 'Type "I ACCEPT" if you agree to the terms of the license: '
+[ "\$REPLY" == "I ACCEPT" ] || exit 1
+
+# Install
+./installer \$CDIR
+
+popd &> /dev/null
+rm -rf \$TMPDIR
+
+exit 0
+
+__ARCHIVE_BELOW__
+EOF
+        cat payload.tar.gz >> $OUT
     else
         echo "payload.tar.gz does not exist"
         exit 1
